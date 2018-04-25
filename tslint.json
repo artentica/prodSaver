@@ -1,14 +1,15 @@
 {
-  "defaultSeverity": "warning",
-  "extends": [
-    "tslint:recommended"
-  ],
+  "defaultSeverity": "error",
+  "extends": ["tslint:latest", "tslint-config-prettier"],
+  "jsRules": {},
   "rules": {
-    "quotemark": [true, "single"],
-    "indent": [true, "spaces", 2],
-    "interface-name": false,
+    "member-ordering": false,
     "ordered-imports": false,
+    "no-implicit-dependencies": false,
     "object-literal-sort-keys": false,
+    "no-submodule-imports": false,
+    "interface-name": false,
     "no-consecutive-blank-lines": false
-  }
+  },
+  "rulesDirectory": []
 }
