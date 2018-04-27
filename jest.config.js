@@ -1,20 +1,11 @@
 module.exports = {
-  moduleFileExtensions: [
-    'ts',
-    'tsx',
-    'js',
-    'jsx',
-    'json',
-    'vue'
-  ],
+  moduleFileExtensions: ['js', 'jsx', 'json', 'vue'],
   transform: {
     '^.+\\.vue$': 'vue-jest',
-    '^.+\\.tsx?$': 'ts-jest'
+    '^.+\\.jsx?$': 'babel-jest',
   },
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1'
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
-  snapshotSerializers: [
-    'jest-serializer-vue'
-  ]
-}
+  snapshotSerializers: ['jest-serializer-vue'],
+};
