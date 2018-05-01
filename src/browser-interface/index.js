@@ -1,6 +1,6 @@
 /*
- * v0.1-alpha.1
- * https://github.com/blex41/browser-interface/releases/tag/v0.1-alpha.1
+ * v0.1-alpha.2
+ * https://github.com/blex41/browser-interface/tree/v0.1-alpha.2
  */
 
 import ChromeDriver from './chrome/';
