@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@babel/preset-stage-2": "^7.0.0-beta.46",
+    "browser-interface": "0.0.1",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
