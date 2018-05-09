@@ -3,17 +3,27 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service lint && vue-cli-service serve",
     "build": "vue-cli-service build",
     "test": "vue-cli-service test",
     "e2e": "vue-cli-service e2e",
     "lint": "vue-cli-service lint",
-    "e2e:open": "vue-cli-service e2e:open"
+    "e2e:open": "vue-cli-service e2e:open",
+    "dev:extension": "webpack --config extension_src/webpack.config.js --env=development --watch",
+    "build:extension": "webpack --config extension_src/webpack.config.js --env=production",
+    "build:manifest": "node extension_src/manifest/index.js",
+    "build:all": "npm run build && npm run build:extension && npm run build:manifest"
   },
   "dependencies": {
     "@babel/preset-stage-2": "^7.0.0-beta.46",
+    "babel-polyfill": "^6.26.0",
+    "material-design-icons-iconfont": "^3.0.3",
+    "uuid": "^3.2.1",
+    "browser-interface": "0.0.4",
     "vue": "^2.5.16",
+    "vue-color": "^2.4.6",
     "vue-router": "^3.0.1",
+    "vuetify": "^1.0.17",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
@@ -28,13 +38,18 @@
     "@vue/test-utils": "^1.0.0-beta.10",
     "babel-core": "^7.0.0-0",
     "babel-jest": "^22.0.4",
+    "babel-loader": "^7.1.4",
+    "btoa": "^1.2.1",
     "commitizen": "^2.9.6",
     "cz-conventional-changelog": "^2.1.0",
+    "generate-json-webpack-plugin": "^0.3.1",
     "lint-staged": "^6.1.1",
     "node-sass": "^4.7.2",
     "npm-run-all": "^4.1.2",
     "prettier": "^1.12.1",
     "sass-loader": "^6.0.6",
+    "sha.js": "^2.4.11",
+    "uglifyjs-webpack-plugin": "^1.2.5",
     "vue-template-compiler": "^2.5.16"
   },
   "browserslist": [

@@ -13,4 +13,5 @@ module.exports = {
   testMatch: [
     '<rootDir>/(tests/unit/**/*.spec.(ts|tsx|js)|**/__tests__/*.(ts|tsx|js))',
   ],
+  mapCoverage: true,
 };
