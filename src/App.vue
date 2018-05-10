@@ -41,15 +41,18 @@
           </v-list>
         </v-menu>        
       </v-footer>
+      <UnsavedRuleDialog />
     </div>
   </v-app>
 </template>
 
 <script>
+import UnsavedRuleDialog from './components/UnsavedRuleDialog.vue';
 import router from './router';
 
 export default {
   name: 'App',
+  components: { UnsavedRuleDialog },
   computed: {
     langs: function() {
       return this.$store.getters.langsAvailable;
@@ -57,6 +60,9 @@ export default {
     previousIconVisible() {
       return this.$route.path !== '/';
     },
+  },
+  created() {
+    this.$store.dispatch('loadSettings');
   },
   methods: {
     rulesPage() {
@@ -96,7 +102,6 @@ body {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
 }
 #nav {

@@ -34,7 +34,7 @@
         </v-flex>
         <rule-card 
           v-else
-          v-for="rule in this.$store.state.rules" 
+          v-for="rule in $store.getters.rules" 
           :key="rule.id"
           :id="rule.id"
           :name="rule.name" 
@@ -70,5 +70,6 @@ export default {
 <style scoped lang="scss">
 .empty {
   padding: 3.2rem 1.6rem;
+  text-align: center;
 }
 </style>

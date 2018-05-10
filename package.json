@@ -17,9 +17,10 @@
   "dependencies": {
     "@babel/preset-stage-2": "^7.0.0-beta.46",
     "babel-polyfill": "^6.26.0",
+    "browser-interface": "0.0.6",
+    "lodash": "^4.17.10",
     "material-design-icons-iconfont": "^3.0.3",
     "uuid": "^3.2.1",
-    "browser-interface": "0.0.4",
     "vue": "^2.5.16",
     "vue-color": "^2.4.6",
     "vue-router": "^3.0.1",
@@ -49,6 +50,7 @@
     "prettier": "^1.12.1",
     "sass-loader": "^6.0.6",
     "sha.js": "^2.4.11",
+    "style-loader": "^0.21.0",
     "uglifyjs-webpack-plugin": "^1.2.5",
     "vue-template-compiler": "^2.5.16"
   },

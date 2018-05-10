@@ -1,9 +1,9 @@
 <template>
   <div>
-    <h2>{{ ruleTitle }}</h2>
     <v-flex 
       xs10 
       offset-xs1>
+      <h2>{{ ruleTitle }}</h2>
       <v-text-field
         name="RuleName"
         label="Rule name"
@@ -32,9 +32,9 @@
       xs10 
       offset-xs1>
       <v-text-field
-        name="bannerName"
-        label="banner name"
-        v-model="rule.banner.name"
+        name="bannerLabel"
+        label="banner label"
+        v-model="rule.banner.label"
       />
     </v-flex>
     <v-flex 
@@ -48,7 +48,7 @@
       xs10 
       offset-xs1>
       <v-select
-        :items="bannerType"
+        :items="bannerTypes"
         v-model="rule.banner.type"
         label="banner type"
         single-line
@@ -59,7 +59,7 @@
       xs10 
       offset-xs1>
       <v-select
-        :items="bannerPosition"
+        :items="bannerPositionsAvailable"
         v-model="rule.banner.position"
         label="banner position"
         single-line
@@ -82,6 +82,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import ColorPicker from '@/components/ColorPicker.vue';
 import SelectChips from '@/components/SelectChips.vue';
 import router from '../router';
@@ -100,19 +101,8 @@ export default {
   },
   data: function() {
     return {
-      rule: {
-        enabled: true,
-        name: '',
-        pattern: '',
-        methods: [],
-        banner: {
-          name: '',
-          type: '',
-          position: '',
-          color: '',
-        },
-      },
-      bannerType: [],
+      rule: _.cloneDeep(this.$store.getters.defaultRule),
+      bannerTypes: [],
       methodsList: [],
     };
   },
@@ -120,27 +110,35 @@ export default {
     ruleTitle: function() {
       return this.rule.new ? 'New Rule' : 'Rule modification';
     },
-    bannerPosition: function() {
-      const banners = this.$store.getters.banner;
-      let index = banners.findIndex(el => {
-        return this.rule.banner.type === el.type;
-      });
-      return banners[index].position;
+    bannerPositionsAvailable: function() {
+      const bannerType = this.$store.getters.bannerType(this.rule.banner.type);
+      return bannerType.positionsAvailable;
     },
   },
   watch: {
     rule: {
       handler: function() {
-        this.$store.dispatch('updateBackend', this.id);
+        this.$store.dispatch('saveRule', this.rule);
+      },
+      deep: true,
+    },
+    bannerPositionsAvailable: {
+      handler(newList, oldList) {
+        if (
+          !_.isEqual(newList, oldList) &&
+          !newList.includes(this.rule.banner.position)
+        ) {
+          this.rule.banner.position = newList[0];
+        }
       },
       deep: true,
     },
   },
   created: function() {
     this.rule = this.$store.getters.rule(this.id);
-    this.savedRule = Object.assign({}, this.savedRule, this.rule);
+    this.savedRule = _.cloneDeep(this.rule);
 
-    this.bannerType = this.$store.getters.banner.map(el => {
+    this.bannerTypes = this.$store.getters.bannerTypes.map(el => {
       return el.type;
     });
 
@@ -148,17 +146,37 @@ export default {
   },
   methods: {
     cancel() {
-      if (this.rule.new) this.$store.dispatch('removeRule', this.rule.id);
-      else this.$store.dispatch('saveRule', this.savedRule);
+      this.rule = _.cloneDeep(this.savedRule);
+      // We need to trigger saveRule because the rule watch handler
+      // does not have time to do it before leaving the route
+      this.$store.dispatch('saveRule', this.rule);
       router.push({ name: 'Rules' });
     },
     save() {
+      this.rule.new = false;
+      this.savedRule = _.cloneDeep(this.rule);
+      // We need to trigger saveRule because the rule watch handler
+      // does not have time to do it before leaving the route
+      this.$store.dispatch('saveRule', this.rule);
       router.push({ name: 'Rules' });
     },
   },
   beforeRouteLeave(to, from, next) {
-    this.rule.new = false;
-    next();
+    // If there is no difference between rule and savedRule
+    // (the rule has been saved, or no change was made)
+    if (_.isEqual(this.rule, this.savedRule)) {
+      // If the rule is new, remove it
+      if (this.rule.new) {
+        this.$store.dispatch('removeRule', this.rule.id);
+      }
+      next();
+      // Else, if changes were made and not saved
+    } else {
+      this.$store.dispatch('showUnsavedRuleDialog', {
+        cancel: this.cancel,
+        save: this.save,
+      });
+    }
   },
 };
 </script>
