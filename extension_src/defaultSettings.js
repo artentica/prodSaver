@@ -17,6 +17,7 @@ const predefinedRules = [
 const defaultSettings = {
   langChosen: 'en_US',
   rules: predefinedRules,
+  pendingModifications: false,
 };
 
 export default defaultSettings;

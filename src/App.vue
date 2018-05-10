@@ -62,7 +62,24 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('loadSettings');
+    this.$store.dispatch('loadSettings', () => {
+      // If a rule was being edited right before closing the popup
+      // or if a new, unedited rule was open, reopen that rule
+      const pendingRule = this.$store.getters.pendingNotifications;
+      const newRule = this.$store.getters.rules.find(r => r.new);
+
+      const rule = pendingRule ? pendingRule : newRule;
+
+      if (rule) {
+        router.push({
+          name: 'EditRule',
+          params: {
+            id: rule.id,
+            restoredSavedRule: rule,
+          },
+        });
+      }
+    });
   },
   methods: {
     rulesPage() {

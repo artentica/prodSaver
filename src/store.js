@@ -48,6 +48,9 @@ export default new Vuex.Store({
     UPDATE_UNSAVED_DIALOG(state, data) {
       state.unsavedRuleDialog = data;
     },
+    UPDATE_PENDING_MODIFICATIONS(state, data) {
+      state.settings.pendingModifications = data;
+    },
   },
   actions: {
     /*
@@ -90,9 +93,12 @@ export default new Vuex.Store({
      * Loads the settings from the API
      * and applies them to the store
      */
-    loadSettings(context) {
+    loadSettings(context, callback = null) {
       api.settings.get().then(res => {
         context.commit('LOAD_SETTINGS', res);
+        if (callback !== null) {
+          callback(res);
+        }
       });
     },
     /*
@@ -131,6 +137,13 @@ export default new Vuex.Store({
       const callback = context.state.unsavedRuleDialog.callbacks.save;
       if (callback !== undefined) callback();
       context.dispatch('hideUnsavedRuleDialog');
+    },
+    /*
+     * Saves the given pending rule modifications
+     */
+    updatePendingModifications(context, data) {
+      context.commit('UPDATE_PENDING_MODIFICATIONS', data);
+      this.dispatch('updateBackend');
     },
   },
   getters: {
@@ -218,6 +231,12 @@ export default new Vuex.Store({
      */
     unsavedRuleDialog: state => {
       return state.unsavedRuleDialog;
+    },
+    /*
+     * Returns pending rule modifications
+     */
+    pendingNotifications: state => {
+      return state.settings.pendingModifications;
     },
   },
 });

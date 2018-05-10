@@ -98,6 +98,10 @@ export default {
       type: String,
       default: '',
     },
+    restoredSavedRule: {
+      type: Object,
+      default: null,
+    },
   },
   data: function() {
     return {
@@ -119,6 +123,9 @@ export default {
     rule: {
       handler: function() {
         this.$store.dispatch('saveRule', this.rule);
+        if (!_.isEqual(this.rule, this.savedRule)) {
+          this.$store.dispatch('updatePendingModifications', this.rule);
+        }
       },
       deep: true,
     },
@@ -136,7 +143,12 @@ export default {
   },
   created: function() {
     this.rule = this.$store.getters.rule(this.id);
-    this.savedRule = _.cloneDeep(this.rule);
+
+    if (this.restoredSavedRule === null) {
+      this.savedRule = _.cloneDeep(this.rule);
+    } else {
+      this.savedRule = _.cloneDeep(this.restoredSavedRule);
+    }
 
     this.bannerTypes = this.$store.getters.bannerTypes.map(el => {
       return el.type;
@@ -150,6 +162,7 @@ export default {
       // We need to trigger saveRule because the rule watch handler
       // does not have time to do it before leaving the route
       this.$store.dispatch('saveRule', this.rule);
+      this.$store.dispatch('updatePendingModifications', false);
       router.push({ name: 'Rules' });
     },
     save() {
@@ -158,6 +171,7 @@ export default {
       // We need to trigger saveRule because the rule watch handler
       // does not have time to do it before leaving the route
       this.$store.dispatch('saveRule', this.rule);
+      this.$store.dispatch('updatePendingModifications', false);
       router.push({ name: 'Rules' });
     },
   },
