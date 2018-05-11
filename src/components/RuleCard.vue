@@ -1,43 +1,44 @@
 <template>
   <v-flex xs12>
     <v-card>
-      <v-card-title primary-title>
-        <div>
-          <h3 class="headline">{{ name }}</h3>
-          <v-menu
-            transition="slide-x-transition"
-            bottom
-            left
-          >
-            <v-btn 
-              slot="activator" 
-              icon>
-              <v-icon>settings</v-icon>
-            </v-btn>
-            <v-list>
-              <v-list-tile
-                @click="ruleForm()"
-              >
-                <v-list-tile-title>Edit</v-list-tile-title>
-              </v-list-tile>
-              <v-list-tile
-                @click="removeRule()"
-              >
-                <v-list-tile-title>Delete</v-list-tile-title>
-              </v-list-tile>
-            </v-list>
-          </v-menu>
- 
-          <div>{{ pattern }}</div>
-            
-        </div>
+      <v-card-title class="pb-0">
+        <v-menu
+          transition="slide-x-transition"
+          bottom
+          left
+        >
+          <v-btn 
+            slot="activator" 
+            icon>
+            <v-icon>settings</v-icon>
+          </v-btn>
+          <v-list>
+            <v-list-tile
+              @click="ruleForm()"
+            >
+              <v-list-tile-title>Edit</v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile
+              @click="removeRule()"
+            >
+              <v-list-tile-title>Delete</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
+        <v-layout column>
+          <h3 class="title">{{ name || '&nbsp;' }}</h3>
+          <div class="pattern">{{ pattern }}</div>
+        </v-layout>
       </v-card-title>
+
       <v-card-actions>
         <v-switch
           v-model="switchEnabled" />
         <v-spacer/>
         <div class="text-xs-center">
           <v-chip 
+            small
+            disabled
             v-for="method in methods" 
             :key="method">{{ method }}</v-chip>
         </div>
@@ -87,6 +88,9 @@ export default {
     position: absolute;
     top: 0;
     right: 0;
+  }
+  .pattern {
+    color: #bbb;
   }
 }
 ul {

@@ -1,33 +1,30 @@
 <template>
-  <v-container>
-    <v-layout 
-      row 
-      wrap
-      ref="colorpicker">
-      <v-flex 
-        xs10>
-        <v-text-field 
-          :name="name"
-          :label="label"
-          class="form-control" 
-          v-model="colorValue" 
-          @focus="showPicker()" 
-          @input="updateFromInput" />
-      </v-flex>
-      <v-flex 
-        xs2>
-        <span 
-          class="current-color" 
-          :style="'background-color: ' + colorValue" 
-          @click="togglePicker()"/>
-      </v-flex>
-      <chrome-picker 
-        :value="colors" 
-        @input="updateFromPicker" 
-        v-if="displayPicker" />
-    </v-layout>
-  </v-container>
-
+  <v-layout 
+    row 
+    wrap>
+    <v-flex class="mr-2">
+      <v-text-field 
+        :name="name"
+        :label="label"
+        class="form-control" 
+        v-model="colorValue" 
+        @focus="showPicker()" 
+        @input="updateFromInput"
+        @mousedown.stop />
+    </v-flex>
+    <div
+      style="width:24px">
+      <span 
+        class="current-color" 
+        :style="'background-color: ' + colorValue" 
+        @mousedown.stop="togglePicker()"/>
+    </div>
+    <chrome-picker 
+      ref="colorpicker"
+      :value="colors" 
+      @input="updateFromPicker" 
+      v-if="displayPicker" />
+  </v-layout>
 </template>
 
 <script>
@@ -40,7 +37,7 @@ export default {
   props: {
     color: { type: String, default: '' },
     name: { type: String, default: 'colorPicker' },
-    label: { type: String, default: 'Color of the banner' },
+    label: { type: String, default: 'Banner color' },
     value: {
       type: String,
       default: () => '',
@@ -94,11 +91,11 @@ export default {
       }
     },
     showPicker() {
-      document.addEventListener('click', this.documentClick);
+      document.addEventListener('mousedown', this.documentMouseDown);
       this.displayPicker = true;
     },
     hidePicker() {
-      document.removeEventListener('click', this.documentClick);
+      document.removeEventListener('mousedown', this.documentMouseDown);
       this.displayPicker = false;
     },
     togglePicker() {
@@ -124,10 +121,10 @@ export default {
           ')';
       }
     },
-    documentClick(e) {
+    documentMouseDown(e) {
       var el = this.$refs.colorpicker,
         target = e.target;
-      if (el !== target && !el.contains(target)) {
+      if (el !== undefined && el.$el !== target && !el.$el.contains(target)) {
         this.hidePicker();
       }
     },

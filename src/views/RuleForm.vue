@@ -1,84 +1,69 @@
 <template>
-  <div>
-    <v-flex 
-      xs10 
-      offset-xs1>
+  <v-container class="pa-0 ma-0">
+
+    <v-layout 
+      class="px-0 mx-3 my-2"
+    >
       <h2>{{ ruleTitle }}</h2>
-      <v-text-field
-        name="RuleName"
-        label="Rule name"
-        v-model="rule.name"
-      />
-    </v-flex>
-    <v-flex 
-      xs10 
-      offset-xs1>
-      <v-text-field
-        name="URLPattern"
-        label="Url pattern to match (Regex)"
-        v-model="rule.pattern"
-      />
-    </v-flex>
-    <v-flex 
-      xs10 
-      offset-xs1>
-      <select-chips 
-        :chips="methodsList" 
-        v-model="rule.methods" />
-    </v-flex>
-    <v-divider/>
+    </v-layout>
 
-    <v-flex 
-      xs10 
-      offset-xs1>
-      <v-text-field
-        name="bannerLabel"
-        label="banner label"
-        v-model="rule.banner.label"
-      />
-    </v-flex>
-    <v-flex 
-      xs10 
-      offset-xs1>
-      <color-picker 
-        v-model="rule.banner.color"/>
-    </v-flex>
+    <v-layout
+      column
+      class="mx-3"
+    >
+      <v-flex>
+        <v-text-field
+          name="RuleName"
+          label="Rule name"
+          v-model="rule.name"
+        />
+      </v-flex>
+      <v-flex>
+        <v-text-field
+          name="URLPattern"
+          label="Url pattern to match (Regex)"
+          v-model="rule.pattern"
+        />
+      </v-flex>
+      <v-flex>
+        <select-chips 
+          :chips="methodsList" 
+          v-model="rule.methods" />
+      </v-flex>
 
-    <v-flex 
-      xs10 
-      offset-xs1>
-      <v-select
-        :items="bannerTypes"
-        v-model="rule.banner.type"
-        label="banner type"
-        single-line
-      />
-    </v-flex>    
+      <v-divider/>
 
-    <v-flex 
-      xs10 
-      offset-xs1>
-      <v-select
-        :items="bannerPositionsAvailable"
-        v-model="rule.banner.position"
-        label="banner position"
-        single-line
-      />
-    </v-flex>    
-    
-    <v-container>
-      <v-layout 
-        row 
-        wrap>
-        <v-btn @click="cancel">Annuler</v-btn>
-        <v-spacer/>
-        <v-btn
-          dark 
-          color="primary"
-          @click="save">Enregistrer</v-btn>
-      </v-layout>
-    </v-container>
-  </div>
+      <v-flex>
+        <v-text-field
+          name="bannerLabel"
+          label="Banner label"
+          v-model="rule.banner.label"
+        />
+        <color-picker 
+          v-model="rule.banner.color"/>
+      </v-flex>
+    </v-layout>
+
+    <v-layout
+      class="mx-3"
+      row 
+      wrap>
+      <v-flex class="mr-4">
+        <v-select
+          :items="bannerTypes"
+          v-model="rule.banner.type"
+          label="Banner type"
+        />
+      </v-flex>    
+      <v-flex>
+        <v-select
+          :items="bannerPositionsAvailable"
+          v-model="rule.banner.position"
+          label="Banner position"
+        />
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -143,12 +128,9 @@ export default {
   },
   created: function() {
     this.rule = this.$store.getters.rule(this.id);
-
-    if (this.restoredSavedRule === null) {
-      this.savedRule = _.cloneDeep(this.rule);
-    } else {
-      this.savedRule = _.cloneDeep(this.restoredSavedRule);
-    }
+    this.savedRule = _.cloneDeep(
+      this.restoredSavedRule === null ? this.rule : this.restoredSavedRule,
+    );
 
     this.bannerTypes = this.$store.getters.bannerTypes.map(el => {
       return el.type;
@@ -159,15 +141,14 @@ export default {
   methods: {
     cancel() {
       this.rule = _.cloneDeep(this.savedRule);
-      // We need to trigger saveRule because the rule watch handler
-      // does not have time to do it before leaving the route
-      this.$store.dispatch('saveRule', this.rule);
-      this.$store.dispatch('updatePendingModifications', false);
-      router.push({ name: 'Rules' });
+      this.applyChanges();
     },
     save() {
       this.rule.new = false;
       this.savedRule = _.cloneDeep(this.rule);
+      this.applyChanges();
+    },
+    applyChanges() {
       // We need to trigger saveRule because the rule watch handler
       // does not have time to do it before leaving the route
       this.$store.dispatch('saveRule', this.rule);
@@ -184,6 +165,9 @@ export default {
         this.$store.dispatch('removeRule', this.rule.id);
       }
       next();
+      // Else, if changes were saved using the top bar button
+    } else if (!this.$store.getters.pendingModifications) {
+      next();
       // Else, if changes were made and not saved
     } else {
       this.$store.dispatch('showUnsavedRuleDialog', {
@@ -194,10 +178,3 @@ export default {
   },
 };
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-h3 {
-  margin: 40px 0 0;
-}
-</style>

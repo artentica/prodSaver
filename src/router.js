@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
-import RuleForm from '@/components/RuleForm.vue';
+import RuleForm from './views/RuleForm.vue';
 
 Vue.use(Router);
 

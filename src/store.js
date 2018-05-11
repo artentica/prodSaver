@@ -235,7 +235,7 @@ export default new Vuex.Store({
     /*
      * Returns pending rule modifications
      */
-    pendingNotifications: state => {
+    pendingModifications: state => {
       return state.settings.pendingModifications;
     },
   },
