@@ -189,7 +189,7 @@ export default new Vuex.Store({
     rule: state => {
       return id => {
         const rule = state.settings.rules.find(r => r.id === id);
-        if (rule === undefined) {
+        if (_.isEmpty(rule)) {
           return {
             ..._.cloneDeep(state.config.defaultRule),
             id: uuidv4(),

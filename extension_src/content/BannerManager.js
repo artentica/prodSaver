@@ -1,13 +1,29 @@
 import './banner.scss';
+import defaultBannerSettings from '../defaultBannerSettings.js';
+import config from '../config.js';
+import _ from 'lodash';
 
-const defaultSettings = {
-  active: false,
-  message: '',
-  style: {
-    background: null,
-    color: null,
-  },
-};
+/*
+* The list of banner type
+*/
+const bannerTypeList = _.flatten(
+  config.bannerTypes.map(b => {
+    return b.type;
+  }),
+);
+
+/*
+* The list of position
+*/
+const bannerPositionList = [
+  ...new Set(
+    _.flatten(
+      config.bannerTypes.map(b => {
+        return b.positionsAvailable;
+      }),
+    ),
+  ),
+];
 
 const BannerManager = () => {
   const bm = {
@@ -20,7 +36,7 @@ const BannerManager = () => {
      */
     init() {
       bm.refs.doc = document;
-      bm.applySettings(defaultSettings);
+      bm.applySettings(defaultBannerSettings);
       return bm;
     },
     /*
@@ -116,7 +132,9 @@ const BannerManager = () => {
      * Sets the banner's type
      */
     setType(type) {
-      const classesToRemove = ['bar', 'macaron'].map(t => `${bm.prefix}${t}`);
+      console.log(type);
+      const classesToRemove = bannerTypeList.map(t => `${bm.prefix}${t}`);
+      console.log(classesToRemove);
       bm.refs.container.classList.remove(...classesToRemove);
       bm.refs.container.classList.add(`${bm.prefix}${type}`);
     },
@@ -124,9 +142,10 @@ const BannerManager = () => {
      * Sets the banner's position
      */
     setPosition(position) {
-      const classesToRemove = ['top', 'left', 'bottom', 'right'].map(
-        p => `${bm.prefix}${p}`,
+      const classesToRemove = bannerPositionList.map(p =>
+        p.split(' ').map(positionSplitted => `${bm.prefix}${positionSplitted}`),
       );
+      console.log(classesToRemove);
       bm.refs.container.classList.remove(...classesToRemove);
       bm.refs.container.classList.add(
         ...position.split(' ').map(p => `${bm.prefix}${p}`),
@@ -162,21 +181,33 @@ const BannerManager = () => {
     shouldBeHidden(pos) {
       switch (bm.settings.banner.position) {
         case 'top':
-          return pos.top < 80;
+          return pos.top < config.bannerPositionSide.side;
         case 'bottom':
-          return pos.bottom < 80;
+          return pos.bottom < config.bannerPositionSide.side;
         case 'left':
-          return pos.left < 80;
+          return pos.left < config.bannerPositionSide.side;
         case 'right':
-          return pos.right < 80;
+          return pos.right < config.bannerPositionSide.side;
         case 'top left':
-          return pos.top < 140 && pos.left < 140;
+          return (
+            pos.top < config.bannerPositionSide.diag &&
+            pos.left < config.bannerPositionSide.diag
+          );
         case 'top right':
-          return pos.top < 140 && pos.right < 140;
+          return (
+            pos.top < config.bannerPositionSide.diag &&
+            pos.right < config.bannerPositionSide.diag
+          );
         case 'bottom left':
-          return pos.bottom < 140 && pos.left < 140;
+          return (
+            pos.bottom < config.bannerPositionSide.diag &&
+            pos.left < config.bannerPositionSide.diag
+          );
         case 'bottom right':
-          return pos.bottom < 140 && pos.right < 140;
+          return (
+            pos.bottom < config.bannerPositionSide.diag &&
+            pos.right < config.bannerPositionSide.diag
+          );
         default:
           return false;
       }

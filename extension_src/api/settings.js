@@ -32,8 +32,7 @@ const Settings = {
    */
   get(prop = null) {
     return driver.storage[storageArea].get(storageKey).then(res => {
-      const settings =
-        res && Object.keys(res).length ? res[storageKey] : defaultSettings;
+      const settings = _.get(res, storageKey, defaultSettings);
       if (prop === null) {
         return settings;
       } else if (typeof prop === 'string') {

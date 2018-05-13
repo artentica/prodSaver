@@ -14,6 +14,11 @@ const bannerTypes = [
   },
 ];
 
+const bannerPositionSide = {
+  diag: 140,
+  side: 80,
+};
+
 const defaultRule = {
   enabled: true,
   name: '',
@@ -32,6 +37,7 @@ const config = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   bannerTypes,
   defaultRule,
+  bannerPositionSide,
 };
 
 export default config;
