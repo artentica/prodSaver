@@ -132,9 +132,7 @@ const BannerManager = () => {
      * Sets the banner's type
      */
     setType(type) {
-      console.log(type);
       const classesToRemove = bannerTypeList.map(t => `${bm.prefix}${t}`);
-      console.log(classesToRemove);
       bm.refs.container.classList.remove(...classesToRemove);
       bm.refs.container.classList.add(`${bm.prefix}${type}`);
     },
@@ -145,7 +143,6 @@ const BannerManager = () => {
       const classesToRemove = bannerPositionList.map(p =>
         p.split(' ').map(positionSplitted => `${bm.prefix}${positionSplitted}`),
       );
-      console.log(classesToRemove);
       bm.refs.container.classList.remove(...classesToRemove);
       bm.refs.container.classList.add(
         ...position.split(' ').map(p => `${bm.prefix}${p}`),
@@ -179,35 +176,25 @@ const BannerManager = () => {
      * should be hidden or not, base on the mouse position
      */
     shouldBeHidden(pos) {
+      const side = config.bannerPositionSide.side;
+      const diag = config.bannerPositionSide.diag;
       switch (bm.settings.banner.position) {
         case 'top':
-          return pos.top < config.bannerPositionSide.side;
+          return pos.top < side;
         case 'bottom':
-          return pos.bottom < config.bannerPositionSide.side;
+          return pos.bottom < side;
         case 'left':
-          return pos.left < config.bannerPositionSide.side;
+          return pos.left < side;
         case 'right':
-          return pos.right < config.bannerPositionSide.side;
+          return pos.right < side;
         case 'top left':
-          return (
-            pos.top < config.bannerPositionSide.diag &&
-            pos.left < config.bannerPositionSide.diag
-          );
+          return pos.top < diag && pos.left < diag;
         case 'top right':
-          return (
-            pos.top < config.bannerPositionSide.diag &&
-            pos.right < config.bannerPositionSide.diag
-          );
+          return pos.top < diag && pos.right < diag;
         case 'bottom left':
-          return (
-            pos.bottom < config.bannerPositionSide.diag &&
-            pos.left < config.bannerPositionSide.diag
-          );
+          return pos.bottom < diag && pos.left < diag;
         case 'bottom right':
-          return (
-            pos.bottom < config.bannerPositionSide.diag &&
-            pos.right < config.bannerPositionSide.diag
-          );
+          return pos.bottom < diag && pos.right < diag;
         default:
           return false;
       }
