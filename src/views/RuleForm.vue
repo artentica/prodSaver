@@ -70,7 +70,6 @@
 import _ from 'lodash';
 import ColorPicker from '@/components/ColorPicker.vue';
 import SelectChips from '@/components/SelectChips.vue';
-import router from '../router';
 
 export default {
   name: 'RuleForm',
@@ -93,6 +92,7 @@ export default {
       rule: _.cloneDeep(this.$store.getters.defaultRule),
       bannerTypes: [],
       methodsList: [],
+      currentPage: {},
     };
   },
   computed: {
@@ -137,6 +137,7 @@ export default {
     });
 
     this.methodsList = this.$store.getters.methodsList;
+    this.$store.getters.getCurrentPage.then(data => console.log(data));
   },
   methods: {
     cancel() {
@@ -153,7 +154,7 @@ export default {
       // does not have time to do it before leaving the route
       this.$store.dispatch('saveRule', this.rule);
       this.$store.dispatch('updatePendingModifications', false);
-      router.push({ name: 'Rules' });
+      this.$router.push({ name: 'Rules' });
     },
   },
   beforeRouteLeave(to, from, next) {

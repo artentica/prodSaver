@@ -41,7 +41,6 @@
 <script>
 import RuleCard from '@/components/RuleCard.vue';
 import HomeFooter from '@/components/HomeFooter.vue';
-import router from '../router';
 
 export default {
   name: 'Rules',
@@ -53,7 +52,7 @@ export default {
     newRule() {
       const rule = this.$store.getters.rule();
       this.$store.dispatch('saveRule', rule);
-      router.push({ name: 'EditRule', params: { id: rule.id } });
+      this.$router.push({ name: 'EditRule', params: { id: rule.id } });
     },
   },
 };

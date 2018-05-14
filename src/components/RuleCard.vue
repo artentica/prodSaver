@@ -48,8 +48,6 @@
 </template>
 
 <script>
-import router from '../router';
-
 export default {
   name: 'RuleCard',
   props: {
@@ -71,7 +69,7 @@ export default {
   },
   methods: {
     ruleForm() {
-      router.push({ name: 'EditRule', params: { id: this.id } });
+      this.$router.push({ name: 'EditRule', params: { id: this.id } });
     },
     removeRule() {
       this.$store.dispatch('removeRule', this.id);

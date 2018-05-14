@@ -22,6 +22,7 @@ export default new Vuex.Store({
       visible: false,
       callbacks: {},
     },
+    currentPage: {},
   },
   mutations: {
     UPDATE_LANGUAGE(state, lang) {
@@ -33,6 +34,9 @@ export default new Vuex.Store({
     },
     REMOVE_RULE(state, id) {
       state.settings.rules.splice(ruleIndex(state, id), 1);
+    },
+    PAGEINFO(state, pageInfo) {
+      state.currentPage = pageInfo;
     },
     UPDATE_RULE(state, rule) {
       const index = ruleIndex(state, rule.id);
@@ -80,6 +84,14 @@ export default new Vuex.Store({
     saveRule(context, rule) {
       context.commit('UPDATE_RULE', rule);
       this.dispatch('updateBackend');
+    },
+    /*
+     * Returns current page info from the API
+     */
+    getCurrentPage: () => {
+      return api.settings.getCurrentPage().then(pageInfo => {
+        this.dispatch('PAGEINFO', pageInfo);
+      });
     },
     /*
      * Sends the new state to the API

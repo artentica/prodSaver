@@ -11,7 +11,6 @@
 <script>
 import AppToolbar from './components/AppToolbar.vue';
 import UnsavedRuleDialog from './components/UnsavedRuleDialog.vue';
-import router from './router';
 
 export default {
   name: 'App',
@@ -26,7 +25,7 @@ export default {
       const rule = pendingRule ? pendingRule : newRule;
 
       if (rule) {
-        router.push({
+        this.$router.push({
           name: 'EditRule',
           params: {
             id: rule.id,

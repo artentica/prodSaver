@@ -84,12 +84,12 @@ export default {
         new: false,
       });
       this.$store.dispatch('updatePendingModifications', false);
-      router.push({ name: 'Rules' });
+      this.$router.push({ name: 'Rules' });
     },
     newRule() {
       const rule = this.$store.getters.rule();
       this.$store.dispatch('saveRule', rule);
-      router.push({ name: 'EditRule', params: { id: rule.id } });
+      this.$router.push({ name: 'EditRule', params: { id: rule.id } });
     },
   },
 };

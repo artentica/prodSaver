@@ -27,6 +27,16 @@ driver.storage.onChanged.addListener(dispatchChanges);
 
 const Settings = {
   /*
+   * Get current page information Promise
+   */
+  getCurrentPage() {
+    return driver.tabs
+      .query({ active: true, lastFocusedWindow: true })
+      .then(tabs => {
+        return tabs[0];
+      });
+  },
+  /*
    * Returns a stored value if a property name {string} is provided,
    * or the full object if no parameter is provided.
    */
