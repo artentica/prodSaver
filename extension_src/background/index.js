@@ -19,15 +19,24 @@ const onSettingsChange = updatedSettings => {
 };
 
 /*
+ * Get current page information Promise
+ */
+const getCurrentPage = () => {
+  return driver.tabs.query({ active: true, lastFocusedWindow: true }).then(tabs => {
+    return tabs[0];
+  });
+};
+
+/*
  * Returns the first mathing rule for a tab
  * or a default empty rule
  */
 const getMatchingRule = data => {
   const match = settings.rules.find(
-    r => r.enabled && r.pattern && new RegExp(r.pattern).test(data.url),
+    r => r.enabled && r.pattern && new RegExp(r.pattern).test(data.url)
   );
   return _.cloneDeep(
-    match ? match : { ...settings.defaultRule, enabled: false },
+    match ? match : { ...settings.defaultRule, enabled: false }
   );
 };
 

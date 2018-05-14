@@ -25,8 +25,6 @@
 </template>
 
 <script>
-import router from '../router';
-
 export default {
   name: 'AppToolbar',
   components: {},
@@ -78,7 +76,7 @@ export default {
   },
   methods: {
     rulesPage() {
-      router.push({ name: 'Rules' });
+      this.$router.push({ name: 'Rules' });
     },
     saveRule() {
       this.$store.dispatch('saveRule', {
