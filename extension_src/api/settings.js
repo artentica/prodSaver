@@ -1,7 +1,12 @@
 import BrowserInterface from 'browser-interface';
-import defaultSettings from './defaultSettings.js';
+import _ from 'lodash';
+import defaultSettings from '../defaultSettings.js';
 
-const driver = new BrowserInterface();
+// When testing the app with `npm run serve`,
+// we don't have access to the WebExtension apis,
+// so we'll use a mock
+const useMock = window.location.href.includes('//localhost:');
+const driver = new BrowserInterface(useMock);
 
 const storageKey = 'settings';
 const storageArea = 'sync';
@@ -10,24 +15,24 @@ const activeListeners = [];
 
 // Triggers active listeners when changes are made to the settings
 const dispatchChanges = (changes, area) => {
-  if (area === storageArea && changes.hasOwnProperty(storageKey)) {
-    activeListeners.forEach(listener => listener(changes[storageKey].newValue));
+  if (area === storageArea && _.has(changes, `${storageKey}.newValue`)) {
+    Settings.get().then(settings => {
+      activeListeners.forEach(listener => listener(settings));
+    });
   }
 };
 
 // Listen for changes with the dispatcher
 driver.storage.onChanged.addListener(dispatchChanges);
 
-const UserSettings = {
+const Settings = {
   /*
    * Returns a stored value if a property name {string} is provided,
    * or the full object if no parameter is provided.
    */
   get(prop = null) {
     return driver.storage[storageArea].get(storageKey).then(res => {
-      const storedSettings = res[storageKey];
-      const settings =
-        storedSettings !== undefined ? storedSettings : defaultSettings;
+      const settings = _.get(res, storageKey, defaultSettings);
       if (prop === null) {
         return settings;
       } else if (typeof prop === 'string') {
@@ -48,7 +53,8 @@ const UserSettings = {
   set(props) {
     if (typeof props === 'object') {
       return driver.storage[storageArea].get(storageKey).then(current => {
-        const updatedValue = Object.assign({}, current, props);
+        const safeCurrent = current ? current : { [storageKey]: {} };
+        const updatedValue = Object.assign({}, safeCurrent[storageKey], props);
         return driver.storage[storageArea].set({ [storageKey]: updatedValue });
       });
     }
@@ -83,4 +89,4 @@ const UserSettings = {
   },
 };
 
-export default UserSettings;
+export default Settings;

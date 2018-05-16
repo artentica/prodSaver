@@ -1,6 +1,6 @@
 <template>
   <v-select
-    label="Select"
+    label="Request methods to catch"
     :items="chips"
     v-model="chipsSelect"
     multiple
@@ -13,6 +13,7 @@
       slot-scope="data">
       <v-chip
         close
+        small
         @input="data.parent.selectItem(data.item)"
         :selected="data.selected"
         class="chip--select-multi"

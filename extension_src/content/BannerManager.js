@@ -1,13 +1,29 @@
-import styles from './banner.scss';
+import './banner.scss';
+import defaultBannerSettings from '../defaultBannerSettings.js';
+import config from '../config.js';
+import _ from 'lodash';
 
-const defaultSettings = {
-  active: false,
-  message: '',
-  style: {
-    background: null,
-    color: null,
-  },
-};
+/*
+* The list of banner type
+*/
+const bannerTypeList = _.flatten(
+  config.bannerTypes.map(b => {
+    return b.type;
+  }),
+);
+
+/*
+* The list of position
+*/
+const bannerPositionList = [
+  ...new Set(
+    _.flatten(
+      config.bannerTypes.map(b => {
+        return b.positionsAvailable;
+      }),
+    ),
+  ),
+];
 
 const BannerManager = () => {
   const bm = {
@@ -20,7 +36,7 @@ const BannerManager = () => {
      */
     init() {
       bm.refs.doc = document;
-      bm.applySettings(defaultSettings);
+      bm.applySettings(defaultBannerSettings);
       return bm;
     },
     /*
@@ -33,7 +49,8 @@ const BannerManager = () => {
       bm.settings = data;
       if (bm.settings.enabled) {
         bm.setBackgroundColor(bm.settings.banner.color);
-        //bm.setTextColor(bm.settings.style.color);
+        bm.setType(bm.settings.banner.type);
+        bm.setPosition(bm.settings.banner.position);
         bm.setMessage(bm.settings.banner.label);
       }
     },
@@ -51,20 +68,20 @@ const BannerManager = () => {
      * Adds the banner to the DOM
      */
     addBanner() {
-      bm.refs.style = bm.createElement(
-        'style',
-        {
-          innerHTML: styles,
-        },
-        bm.refs.doc.body,
-      );
       bm.refs.container = bm.createElement(
         'div',
         {
           className: `${bm.prefix}banner`,
-          innerHTML: '',
         },
         bm.refs.doc.body,
+      );
+      bm.refs.label = bm.createElement(
+        'div',
+        {
+          className: `${bm.prefix}label`,
+          innerHTML: '',
+        },
+        bm.refs.container,
       );
       bm.refs.doc.documentElement.addEventListener('mousemove', bm.onMouseMove);
       bm.refs.doc.documentElement.addEventListener(
@@ -77,9 +94,9 @@ const BannerManager = () => {
      */
     removeBanner() {
       if (bm.settings.enabled) {
-        bm.refs.style.outerHTML = '';
+        bm.refs.label.outerHTML = '';
         bm.refs.container.outerHTML = '';
-        delete bm.refs.style;
+        delete bm.refs.label;
         delete bm.refs.container;
         bm.refs.doc.documentElement.removeEventListener(
           'mousemove',
@@ -101,17 +118,50 @@ const BannerManager = () => {
      * Sets the banner's text color
      */
     setTextColor(color) {
-      bm.refs.container.style.color = color;
+      bm.refs.label.style.color = color;
     },
     /*
      * Sets the banner's message
      */
     setMessage(message) {
-      bm.refs.container.innerHTML = message;
+      // Insert a non-breakable space if no text is provided,
+      // in order to maintain the banner's height
+      bm.refs.label.innerHTML = message || '&nbsp;';
+    },
+    /*
+     * Sets the banner's type
+     */
+    setType(type) {
+      const classesToRemove = bannerTypeList.map(t => `${bm.prefix}${t}`);
+      bm.refs.container.classList.remove(...classesToRemove);
+      bm.refs.container.classList.add(`${bm.prefix}${type}`);
+    },
+    /*
+     * Sets the banner's position
+     */
+    setPosition(position) {
+      const classesToRemove = bannerPositionList.map(p =>
+        p.split(' ').map(positionSplitted => `${bm.prefix}${positionSplitted}`),
+      );
+      bm.refs.container.classList.remove(...classesToRemove);
+      bm.refs.container.classList.add(
+        ...position.split(' ').map(p => `${bm.prefix}${p}`),
+      );
     },
     onMouseMove(e) {
-      const top = e.clientY;
-      const newHidden = top < 80;
+      const winSize = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
+      const pos = {
+        top: e.clientY,
+        bottom: winSize.height - e.clientY,
+        left: e.clientX,
+        right: winSize.width - e.clientX,
+      };
+
+      const newHidden = bm.shouldBeHidden(pos);
+
       if (newHidden !== bm.hidden) {
         bm.hidden = newHidden;
         bm.refs.container.classList.toggle(`${bm.prefix}hidden`, bm.hidden);
@@ -120,6 +170,34 @@ const BannerManager = () => {
     onMouseLeave() {
       bm.hidden = false;
       bm.refs.container.classList.remove(`${bm.prefix}hidden`);
+    },
+    /*
+     * Returns a boolean describing if the banner
+     * should be hidden or not, base on the mouse position
+     */
+    shouldBeHidden(pos) {
+      const side = config.bannerPositionSide.side;
+      const diag = config.bannerPositionSide.diag;
+      switch (bm.settings.banner.position) {
+        case 'top':
+          return pos.top < side;
+        case 'bottom':
+          return pos.bottom < side;
+        case 'left':
+          return pos.left < side;
+        case 'right':
+          return pos.right < side;
+        case 'top left':
+          return pos.top < diag && pos.left < diag;
+        case 'top right':
+          return pos.top < diag && pos.right < diag;
+        case 'bottom left':
+          return pos.bottom < diag && pos.left < diag;
+        case 'bottom right':
+          return pos.bottom < diag && pos.right < diag;
+        default:
+          return false;
+      }
     },
     /*
      * Creates a DOM element given its type, attributes and parent node

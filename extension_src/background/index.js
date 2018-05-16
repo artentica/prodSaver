@@ -1,23 +1,34 @@
 import BrowserInterface from 'browser-interface';
+import _ from 'lodash';
+import defaultSettings from '../defaultSettings.js';
 import api from '../api';
+
+// For debugging: you can run api commands in the console
+window.api = api;
 
 const driver = new BrowserInterface();
 
-const settings = {};
+const settings = _.cloneDeep(defaultSettings);
 
 /*
  * Updates the local settings
  */
 const onSettingsChange = updatedSettings => {
-  settings.rules = updatedSettings.rules;
+  settings.rules = _.cloneDeep(updatedSettings.rules);
   applyRules();
 };
 
 /*
  * Returns the first mathing rule for a tab
+ * or a default empty rule
  */
 const getMatchingRule = data => {
-  return settings.rules.find(r => new RegExp(r.pattern).test(data.url));
+  const match = settings.rules.find(
+    r => r.enabled && r.pattern && new RegExp(r.pattern).test(data.url),
+  );
+  return _.cloneDeep(
+    match ? match : { ...settings.defaultRule, enabled: false },
+  );
 };
 
 /*
@@ -42,10 +53,7 @@ const updateBanner = tab => {
     tab.url.startsWith('ftp') ||
     tab.url.startsWith('app')
   ) {
-    const matchingRule = getMatchingRule(tab);
-    const rule = matchingRule
-      ? matchingRule
-      : { ...settings.defaultRule, enabled: false };
+    const rule = getMatchingRule(tab);
     driver.tabs.sendMessage(tab.id, {
       action: 'applySettings',
       data: rule,
@@ -59,6 +67,11 @@ driver.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (tab.active) {
     updateBanner(tab);
   }
+});
+
+// When a tab is made active
+driver.tabs.onActivated.addListener(activeInfo => {
+  driver.tabs.get(activeInfo.tabId).then(t => updateBanner(t));
 });
 
 // Load settings on script startup
