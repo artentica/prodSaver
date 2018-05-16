@@ -35,8 +35,8 @@ export default new Vuex.Store({
     REMOVE_RULE(state, id) {
       state.settings.rules.splice(ruleIndex(state, id), 1);
     },
-    PAGEINFO(state, pageInfo) {
-      state.currentPage = pageInfo;
+    PAGEINFO(state, currentPageInfo) {
+      state.currentPageInfo = currentPageInfo;
     },
     UPDATE_RULE(state, rule) {
       const index = ruleIndex(state, rule.id);
@@ -89,7 +89,7 @@ export default new Vuex.Store({
      * Returns current page info from the API
      */
     getCurrentPage: () => {
-      return api.settings.getCurrentPage().then(pageInfo => {
+      return api.utils.getCurrentPage().then(pageInfo => {
         this.dispatch('PAGEINFO', pageInfo);
       });
     },
